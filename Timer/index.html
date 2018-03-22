@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap-4.0.0-dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: grey;
+        }
+        
+        .section {
+            margin-top:20px;
+            margin-bottom:10px;
+            text-align: center;
+        }
+        
+        .timer {
+            background-color:rgba(111,111,111,0.4);
+            margin-top:30px;
+            margin-bottom:30px;
+            padding-top:20px;
+            padding-bottom:20px;
+            text-align: center;
+        }
+        
+        .controls {
+            color:#ffc107;
+            text-align:center;
+        }
+        
+        .countdown {
+            color:white;
+            font-size:20vw;
+        }
+        
+        .btn {
+            width:100%;
+        }
+        
+        
+    </style>
+    
+    
+    <script>
+        
+        var iTime=60;
+        var tmrCountdown;
+        
+        function PlayBell() {
+            document.getElementById("bell").play();
+        }
+        
+        
+        function Countdown() {
+            iTime -= 1;
+            
+            if (iTime >= 0) {
+                var sTime = "00:00:";
+                sSecTime = iTime;
+
+                if (sSecTime < 10)
+                    sSecTime = "0" + sSecTime;
+
+                sTime += sSecTime;
+                document.getElementById("countdown").innerHTML = sTime;
+                                        
+            }
+            
+            else {
+                clearInterval(tmrCountdown);
+                PlayBell();
+            }
+        }
+            
+            
+        function main() {
+            PlayBell()
+            tmrCountdown = setInterval(Countdown, 1000);
+        }
+            
+        
+        
+    </script>
+
+</head>
+
+<body onLoad="main()">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Simple Timer</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row section">
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr1">1 minute</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr2">2 minutes</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr3">3 minutes</button>
+            </div>
+        </div>
+        <div class="row section">
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr4">4 minute</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr5">5 minutes</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr6">6 minutes</button>
+            </div>
+        </div>
+        <div class="row section">
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr1">7 minute</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr2">8 minutes</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr3">9 minutes</button>
+            </div>
+        </div>
+        <div class="row section">
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr1">10 minute</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr2">15 minutes</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-warning" id="tmr3">20 minutes</button>
+            </div>
+        </div>
+        
+        <div class="row timer">
+            <div class="col">
+                <span class="h1 font-weight-light countdown" id="countdown">00:00:00</span>
+            </div>
+        </div>
+        
+        <div class="row controls">
+            <div class="col">
+                <span class="h1">►</span>
+            </div>
+            <div class="col">
+                <span class="h1">||</span>
+            </div>
+            <div class="col">
+                <span class="h1">߸</span>
+            </div>
+        </div>
+            
+        
+    </div>
+    
+    
+    <audio id="bell">
+        <source src="bell.mp3" type="audio/mpeg">
+    </audio>
+
+
+</body>
+
+</html>
