@@ -5,16 +5,26 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+<!--    <script type="text/javascript" src="cordova.js"></script>-->
+
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap-4.0.0-dist/css/bootstrap.min.css">
+    <script src="jquery/jquery-3.3.1.slim.min.js"></script>
+    <script src="bootstrap-4.0.0-dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
+        @font-face {
+            font-family: 'UbuntuMono';
+            src:url("UbuntuMono-Regular.ttf");
+        }
+        
         body {
             background-color: grey;
         }
         
-        .section {
+        .section, .bottom {
             margin-top:20px;
             margin-bottom:10px;
             text-align: center;
@@ -24,64 +34,156 @@
             background-color:rgba(111,111,111,0.4);
             margin-top:30px;
             margin-bottom:30px;
-            padding-top:20px;
-            padding-bottom:20px;
             text-align: center;
         }
         
         .controls {
             color:#ffc107;
             text-align:center;
+            margin-bottom:20px;
+
+
+
         }
         
         .countdown {
             color:white;
             font-size:20vw;
+            font-family: "UbuntuMono", monospace;
+            font-weight:100;
         }
         
         .btn {
             width:100%;
+            padding-top:5px;
+            padding-bottom:5px;
+            font-size:5.5vw;
         }
+        
+        .settings {
+            height:30px;
+            margin-bottom:15px;
+        }
+        
+        .settings-container {
+            margin:10px;
+            padding:10px;
+        }
+        
         
         
     </style>
     
     
     <script>
-        
-        var iTime=60;
+        var iTimeSet = 0;
+        var iTime = 0;
         var tmrCountdown;
+        var bTimerActive = false;
+        var bTimerPaused = false;
+        var bInterval = false;
+        var bAutostart = false;
         
         function PlayBell() {
+            document.getElementById("bell").src = document.getElementById("alarm").value;
             document.getElementById("bell").play();
         }
         
         
         function Countdown() {
-            iTime -= 1;
-            
-            if (iTime >= 0) {
-                var sTime = "00:00:";
-                sSecTime = iTime;
+            if (bTimerActive && !bTimerPaused) {
+                iTime -= 1;
 
-                if (sSecTime < 10)
-                    sSecTime = "0" + sSecTime;
-
-                sTime += sSecTime;
-                document.getElementById("countdown").innerHTML = sTime;
-                                        
-            }
-            
-            else {
-                clearInterval(tmrCountdown);
-                PlayBell();
+                if (iTime >= 0) {
+                    DisplayTime(iTime);
+                    if (iTime == 0) {
+                        PlayBell();
+                        iTime = iTimeSet;
+                        DisplayTime(iTime);
+                        if (bInterval) {
+                            iTime = iTimeSet;
+                        }
+                        else {
+                            bTimerActive = false;
+                            bTimerPaused = false;
+                            clearInterval(tmrCountdown);
+                        }
+                    }
+                }
             }
         }
             
+        
+        function Play() {
+            $("#settings").collapse("hide");
+            bInterval = document.getElementById("interval-timer").checked;
+
+            if (!bTimerActive) {
+                bTimerActive = true;
+                bTimerPaused = false;
+                tmrCountdown = setInterval(Countdown, 1000);
+            }
+            else if (bTimerPaused) 
+                bTimerPaused = false;
+        }
+        
+        
+        function Pause() {
+            bTimerPaused = true;
+        }
+        
+        
+        function Stop() {
+            bTimerPaused = false;
+            bTimerActive = false;
+            clearInterval(tmrCountdown);
+            iTime = 0;
+            iTimeSet = 0;
+            DisplayTime(iTime);
+        }
+        
+        
+        function DisplayTime(iTimeDisplay) {
+            var sTime = "";
             
+            var sHourTime = Math.floor(iTimeDisplay / 3600);
+            var sMinTime = Math.floor((iTimeDisplay - (sHourTime * 3600)) / 60);
+            var sSecTime = Math.floor((iTimeDisplay - (sHourTime * 3600) - (sMinTime * 60)) % 3600);
+
+            if (sHourTime < 10)
+                sHourTime = "0" + sHourTime;
+            
+            if (sMinTime  < 10)
+                sMinTime = "0" + sMinTime;
+            
+            if (sSecTime < 10)
+                sSecTime = "0" + sSecTime;
+
+            sTime += sHourTime + ":" + sMinTime + ":" + sSecTime;
+            document.getElementById("countdown").innerHTML = sTime;
+        }
+        
+        
+        function AddTime(iTimeIncrement) {
+            iTime += iTimeIncrement;
+            iTimeSet = iTime;
+            
+            if (iTime > (99 * 60 * 60) + (59 * 60) + 59)
+                iTime = (99 * 60 * 60) + (59 * 60) + 59;
+                
+            DisplayTime(iTime);
+            bAutostart = document.getElementById("autostart").checked;            
+            if (bAutostart)
+                Play();
+            
+            $("#settings").collapse("hide");
+            
+        }
+        
+        
         function main() {
-            PlayBell()
-            tmrCountdown = setInterval(Countdown, 1000);
+            DisplayTime(iTime);
+            console.log("bInterval: " + bInterval);
         }
             
         
@@ -91,55 +193,71 @@
 </head>
 
 <body onLoad="main()">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Simple Timer</a>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Simple Timer</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#settings" aria-controls="settings" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse settings-container" id="settings">
+            <div class="row">
+                <div class=" settings">
+                    <img height="60%" src="picol-settings.svg">
+                    <span class="h6 text-light">Settings</span>
+                </div>
+            </div>
+            <form>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="interval-timer">
+                    <label for="interval-timer" class="text-light">Interval Timer</label>
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="autostart">
+                    <label for="autostart" class="text-light">Autostart</label>
+                </div>
+                <div class="form-control bg-dark col-md-4">
+                    <label class="text-light" for="alarm">Alarm</label>
+                    <select id="alarm" class="form-control">
+                        <option selected value="bell-2.mp3">Tibetan Bell</option>
+                        <option value="beep-1.mp3">Beep</option>
+                    </select>
+                </div>
+            </form>
         </div>
     </nav>
 
     <div class="container">
         <div class="row section">
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr1">1 minute</button>
+                <button type="button" class="btn btn-warning" id="tmr_1" onClick="AddTime(1)">1 second</button>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr2">2 minutes</button>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr3">3 minutes</button>
+                <button type="button" class="btn btn-warning" id="tmr_10" onclick="AddTime(10)">10 seconds</button>
             </div>
         </div>
         <div class="row section">
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr4">4 minute</button>
+                <button type="button" class="btn btn-warning" id="tmr1" onClick="AddTime(60)">1 minute</button>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr5">5 minutes</button>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr6">6 minutes</button>
+                <button type="button" class="btn btn-warning" id="tmr2" onclick="AddTime(120)">2 minutes</button>
             </div>
         </div>
         <div class="row section">
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr1">7 minute</button>
+                <button type="button" class="btn btn-warning" id="tmr4" onclick="AddTime(240)">4 minutes</button>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr2">8 minutes</button>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr3">9 minutes</button>
+                <button type="button" class="btn btn-warning" id="tmr6" onclick="AddTime(360)">6 minutes</button>
             </div>
         </div>
+        
         <div class="row section">
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr1">10 minute</button>
+                <button type="button" class="btn btn-warning" id="tmr10" onclick="AddTime(600)">10 minutes</button>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr2">15 minutes</button>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-warning" id="tmr3">20 minutes</button>
+                <button type="button" class="btn btn-warning" id="tmr15" onclick="AddTime(900)">15 minutes</button>
             </div>
         </div>
         
@@ -148,25 +266,25 @@
                 <span class="h1 font-weight-light countdown" id="countdown">00:00:00</span>
             </div>
         </div>
-        
+    </div>
+    
+    <div class="container">
         <div class="row controls">
             <div class="col">
-                <span class="h1">►</span>
+                <a href="#" onclick="Stop()"><img src="picol-stop.svg"></a>
             </div>
             <div class="col">
-                <span class="h1">||</span>
+                <a href="#" onclick="Play()"><img src="picol-play.svg"></a>
             </div>
             <div class="col">
-                <span class="h1">߸</span>
+                <a href="#" onclick="Pause()"><img src="picol-pause.svg"></a>
             </div>
-        </div>
-            
-        
+        </div>   
     </div>
     
     
     <audio id="bell">
-        <source src="bell.mp3" type="audio/mpeg">
+        <source src="bell-2.mp3" type="audio/mpeg">
     </audio>
 
 
